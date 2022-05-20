@@ -838,7 +838,7 @@ At this point you know some Python basics. You know about arithmetic, functions,
 
 I believe the first step is to cement the knowledge bit better in your mind. I find for me a great way to do this is to actually make something. It might a some project, or just some script that helps you do something easier. 
 
-Now, even though remembering how to write everything in Python would be great, you shouldn't sweat it if you can't recall how to do something. As I mentioned in the beginning, there are so many resources for Python, you can easily look up what you need. The point is, the exact details, like syntax or funciton names, don't really matter. It's so much more important to understand the concepts and logic behind how to do something. 
+Now, even though remembering how to write everything in Python would be great, you shouldn't sweat it if you can't recall how to do something. As I mentioned in the beginning, there are so many resources for Python, you can easily look up what you need. The point is, the exact details, like syntax or function names, don't really matter. It's so much more important to understand the concepts and logic behind how to do something. 
 
 Finally, it is very important to stay curious, but patient. The fact is, learning is hard; We might not understand every part of something we learn right away, but that's okay. We can always take a step back and return to the ideas later. But, even though we need to understand that learning is difficult, we need to be ready to pursue it. I find the easiest way start learning about something is to look up if someone has some sort of lesson on it. For example, searching up "python game tutorial" would be a great way to start off making games.
 
