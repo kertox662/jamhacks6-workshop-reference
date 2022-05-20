@@ -75,7 +75,7 @@ Let's start looking at what Python can do with some arithmetic. You can write an
 | Operation  | Symbol  | Example  | Explanation |
 |:---:|:---:|:---:| --- |
 | Addition         | +  | `2 + 3` → `5`  |
-| Subraction       | -  |  `10 - 4` → `6` |
+| Subtraction       | -  |  `10 - 4` → `6` |
 | Multiplication   | *  |  `1.2 * 2.8` → `3.36` |
 | Division         | /  |  `5 / 2` → `2.5` |
 | Floor Division   | // |  `5 // 2` → `2` | `5 / 2` is `2.5`, `2` is that largest integer smaller than `2.5` |
@@ -84,7 +84,7 @@ Let's start looking at what Python can do with some arithmetic. You can write an
 
 Arithmetic in Python follows the standard order of operations. For example the expression `3 * 2 + 64 / 2**4` would evaluate as follows:
 `3 * 2 + 64 / 2**4` → `3 * 2 + 64 / 16` → `6 + 64 / 2**4` → `6 + 4` → `10`.
-You can add parentheses into arithemtic expressions to give the inner expressions higher priority: `2 * (3 + 4)` → `14`
+You can add parentheses into arithmetic expressions to give the inner expressions higher priority: `2 * (3 + 4)` → `14`
 
 Something to keep in mind about division by zero results in an error. There are ways to recover from it, but the simplest will be to check whether the divisor is 0, which we will see later.
 
@@ -93,7 +93,7 @@ Something important in Python is numbers with a decimal part are not actually th
 
 What this shows is that the result of `4//2` is an integer type (shortened to `int`) while `4/2` is a floating point number (shortened to `float`).
 
-There are a few difference between the two types. The most obvious one is floats will print with a decimal point while integers will not. Another difference is the maximum value. Integers in Python do not actually have an upper (nor lower) limit. Floats on the other hand go upto around `10^300` in absolute value. There are also some cases where you have to use one over the other, some which we will see later. There are probably some other differences, but the main point is that these values are not the same.
+There are a few difference between the two types. The most obvious one is floats will print with a decimal point while integers will not. Another difference is the maximum value. Integers in Python do not actually have an upper (nor lower) limit. Floats on the other hand go up to around `10^300` in absolute value. There are also some cases where you have to use one over the other, some which we will see later. There are probably some other differences, but the main point is that these values are not the same.
 
 We can convert between floats and ints. Similar to using `type`, we can give what type we want to convert to, followed by the expression wrapped in parentheses. For example, `float(153)` → `153.0`. The more interesting conversion is from float to int. We cannot represent a decimal number as an integer. In this case, it was decided to just drop the decimal point and everything after it. For example `int(3.1415)` → `3`. 
 
@@ -223,7 +223,7 @@ When comparing two strings like `"apple" <= "banana"`, it will use lexicographic
 Something to note is that not all types can be compared to each other in all ways. For example, `"abc" == 123` is valid and would always evaluate to `False`. On the other hand, `"abc" < 123` is not valid and would cause an error.
 
 #### Boolean Operators
-There are three boolean operators in Python: `not, and, or`. `not` takes a boolean value and inverts it. If the original value, `A`, is true, then `not A` is `False` and vice versa. `and` takes in two boolean values and evalutates to `True` if both values are `True`. `or` is similar but it evaluates to `True` if either of the two original values are `True`. 
+There are three boolean operators in Python: `not, and, or`. `not` takes a boolean value and inverts it. If the original value, `A`, is true, then `not A` is `False` and vice versa. `and` takes in two boolean values and evaluates to `True` if both values are `True`. `or` is similar but it evaluates to `True` if either of the two original values are `True`. 
 
 ### Control Flow
 The programs we can write so far can't react much to the inputs that we give it, apart from displaying slightly different values. The next goal for us will be to look at some ways to control the flow of the program. I will show first conditional blocks, which control which code is run, and then loops which can repeat code more than once.
@@ -510,9 +510,9 @@ Although it may be easier to keep only one type in a particular list whenever po
 We can also get a sublist using these square brackets. This syntax can also be applied to get a substring in a string. You can check it out on [GeeksForGeeks](https://www.geeksforgeeks.org/python-list-slicing/).
 
 #### List operations
-There are several more useful operations for lists. You can check out a more comprehensive list on [W3Schools](https://www.w3schools.com/python/python_ref_list.asp), but I here I will give three examples.
+There are several more useful operations for lists. You can check out a more comprehensive list on [W3Schools](https://www.w3schools.com/python/python_ref_list.asp), but I here I will give four examples.
 
-First is `append`, which will add an element to the end of list. Next is `pop`, which will remove the element at the index you specify. A third operation is `index`, which finds the first index in the list that has the value you specified. 
+First is `append`, which will add an element to the end of list. Next is `pop`, which will remove the element at the index you specify. A third operation is `index`, which finds the first index in the list that has the value you specified. A fourth and final operation is `copy`, which returns a new list with the same elements. 
 
 ```python
 nums = [1,2,3,4,5]
@@ -521,6 +521,7 @@ print(nums) # [1,2,3,4,5,6]
 nums.pop(2)
 print(nums) # [1,2,4,5,6]
 print(nums.index(4)) # 3
+nums2 = nums.copy()
 ```
 
 Many operations like getting the element at some index or `pop` need to be in the bounds for the array. A great function for this is the `len` function, which returns the number of elements in a list.
@@ -627,7 +628,7 @@ We first evaluate `nums`, then index 0 in that list, then index 1 in the next to
 
 ### Functions
 
-As I have been slowly hinting at throughout, we have already seen one aspect of functions: using them. We've seen `print`, `input` and several others. The idea behind a function is to group a piece of code together and be able to use it by specifying the function's name. This is known as "calling" the function. We do this in code by writing out the function's name, followed by parantheses, like `print()`. A powerful aspect of functions is that you can give them information to work with. This information is called the "arguments" to the function. For print, we have put what we want to display in the paratheses. For example, we can do `print("Hello World!")`. When you want to pass more than one argument, you separate them with commas:
+As I have been slowly hinting at throughout, we have already seen one aspect of functions: using them. We've seen `print`, `input` and several others. The idea behind a function is to group a piece of code together and be able to use it by specifying the function's name. This is known as "calling" the function. We do this in code by writing out the function's name, followed by parentheses, like `print()`. A powerful aspect of functions is that you can give them information to work with. This information is called the "arguments" to the function. For print, we have put what we want to display in the parentheses. For example, we can do `print("Hello World!")`. When you want to pass more than one argument, you separate them with commas:
 
 ```python
 n = 5
@@ -652,7 +653,7 @@ We can also write our own functions. The overall format looks like this:
 def function_name(arg1,arg2,...):
     code
 ```
-For the arguments, we can also have 0 arguments by just having nothing in between the paratheses.
+For the arguments, we can also have 0 arguments by just having nothing in between the parentheses.
 
 For example, putting the name prompt code into a function:
 ```python
@@ -661,6 +662,13 @@ def askForName():
     print("Hello", name + "!")
 ```
 We can then run call this function by running `askForName()`.
+
+When calling a function, we will need to give the exact number of arguments that is in the definition. For example, for the following function, we will need to specify exactly two arguments.
+```python
+def add(a,b):
+    return a + b
+```
+We can define the arguments slightly differently to change this behaviour, check out the [Appendix](#appendix) for more details.
 
 We also want a way that specifies what value a function evaluates to. This is done through the `return` keyword. For example, we can write a `square` function which returns a number squared. This of course can be done with the `**` operator, but this is useful to demonstrate returning a value:
 
@@ -697,6 +705,42 @@ def print_quotient(a,b):
     print(a / b)
 ``` 
 
+A final remark for functions is that they work with variables a bit differently. When you define a variable in a function it will by default treat it as a new and separate variable. Take this for example:
+```python
+x = 2
+def f():
+    x = 3
+f()
+print(x) # prints 2
+```
+We see here that even though in the function `f` we assigned the variable `x` to 3, it did not change outside of the function. The variable is available only inside of the function block. Interestingly though, we can still access the outside variable inside of the function:
+```python
+x = 2
+def f():
+    print(x)
+f() # prints 2
+```
+There is a caveat though, if we would later define `x` locally, it would result in an error. Python will try to reference a local version of the variable, but we will be using it before it is defined:
+```python
+x = 2
+def f():
+    print(x) # Results in UnboundLocalError
+    x = 3
+f()
+```
+
+There is a way to get the function to update the variable though. That is through the `global` keyword. In practice it may be bad to keep everything globally, but in a pinch it works well. You will want to specify what variables you want global like so:
+```python
+x = 0
+y = 1
+def f():
+    global x,y # Can be split into multiple lines too
+    x = y + 4
+    y = 2 * x - 1
+f()
+print(x,y) # 5,9
+```
+
 ### Importing Modules
 
 Many simple programs can often be written in a single file. Eventually though, our programs will get too big to cleanly fit into a single file. Another situation we might find ourselves in is that we want speed up development and use someone else's code library. This is where imports come in. The purpose is to be able to run and access code that exists in other files. Imports come in three basic forms. Let's take a look at importing the math library:
@@ -725,7 +769,7 @@ At times we will want to interact with files using Python. We might want to read
 
 #### Reading from a file
 
-The first interaction I will show you is reading from afile. We can open a file using `open("path/to/file")` and setting it to a variable. Make sure that the file actually exists or else you will get an error!
+The first interaction I will show you is reading from a file. We can open a file using `open("path/to/file")` and setting it to a variable. Make sure that the file actually exists or else you will get an error!
 
 There are several ways to read form a file. A comprehensive list of what you can do with a file can be found in the [Python Docs](https://docs.python.org/3/library/io.html#i-o-base-classes).
 
@@ -809,15 +853,52 @@ Hopefully you keep at least a few of these ideas in mind as you continue to lear
 ## Appendix
 
 ### Clearing up the lies
-* Methods vs functions names
-* Class converters?
+Throughout this document I referred to all "commands" that you call as functions. Although it is easier to understand and true in how they are defined, the naming is not usually this general.
+
+The first difference is the distinction between standalone functions and those tied to some variable. We have seen them with the different types, for example lists have `append`, `pop`, and more. When attached to a variable like this these functions are called methods. This comes from a coding technique called Object Oriented Programming (OOP). Here is an introductory [article](https://realpython.com/python3-object-oriented-programming/) for OOP. 
+
+Another distinction is between functions that return a value (other than `None`) and those that do not. If a Python function does not return anything it is more accurate to call it a procedure. The goal of calling it is to get the effects that come from it, like displaying text or updating a variable. With this description we can see that `print` is a procedure while `input` is a function. This of course does not mean that we can't run normal functions just for their effects. Sometimes we may want to pause and wait for the user's go-ahead to continue with the program. `input` is a great way to do that as it will wait for the user to put a newline (or end their own input) before it continues.
+
+Finally, we've been using the type names like `int`,`float`, and `str` to convert between the different types. Although they are implemented as functions, they are a special type called constructors. This is again part of OOP, so it would be good to look at the article linked above.
 
 ### Installing with pip
-
+`pip` is a package manager tool for Python. It helps manage and install modules for you to use. Here are a few useful commands, but for a full list run the `pip -h` for the help menu or check out the [pip docs](https://pip.pypa.io/en/stable/):
+- `pip install <package1> <package2> ...`  will try to install all of the packages if available. E.g. `pip install numpy`
+- `pip install --upgrade <package1> ...` will install the latest versions of the package.
+- `pip uninstall <package1> ...` uninstalls packages.
+- `pip search <package1>` will search for available packages with the name that you provided.
+- `pip list` shows you the packages you have installed.
 ### Arithmetic assignment
 
-### String operations and Integer conversion
+I've shown you the simple way of updating a variable with arithmetic operators. For example:
+```python
+x = 4
+x = x + 3
+```
+There is a small shortcut though to not need to write the `x` in the expression, available for the arithmetic operators.
 
+```python3
+x = 4
+x += 3
+x -= 1
+x **= 4
+...
+```
+
+It is also available for other types as well, such as strings:
+```python
+s = "Hello"
+s += " World!"
+```
+
+### String operations and Integer conversion
+Here are some string methods I often use in Python. For a more comprehensive list see the [Python Docs](https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str):
+- `startswith` and `endswith` return whether or not the string starts/ends with the given string. Ex. `"Hello World".startswith("Hello")` → `True`
+- `upper` and `lower` return a string where all letters of the original string were turned to upper/lowercase. Ex. `"Hello".upper()`→`"HELLO"`
+- `count` returns the number of occurrences of a substring in the string. Ex. `"abc123abcabc".count("abc")` → `3`
+- `replace` replaces all occurrences of a substring by another string. Ex. `"Banana Boat".replace("a","o")` → `"Bonono Boot"`
+- `split` returns a list of strings where each element was originally split by a given delimiter. The default delimiter is a space if none is specified. Ex. `"a,b,c".split(",")` → `["a", "b", "c"]`
+- `join` joins a given list of strings using the string as a separator. Ex. `",".join(["a", "b", "c"])` → `"a,b,c"`
 ### Blocks of Code
 Something else that's required for if statements is that all lines in the block are indented the same amount. Otherwise this will cause an error:
 
@@ -840,6 +921,107 @@ if a > 5:
     pass
 ...
 ```
-### More on Function Arguments
 
+### A Mystery with Lists (and other objects)
+A long time ago I ran into something unexpected. It is best demonstrated using the following:
+```python
+l = [1,2,3]
+def myAppend(l,elem):
+    l.append(elem)
+myAppend(l,4)
+print(l) # [1, 2, 3, 4]
+```
+What happened here. We passed in a list to the function, and even though it wasn't specified as global it still modified the list! The reason why: we used a method that modified the list. When you pass in a list or object, it is (likely, I haven't looked at the actual implementation) passed in as a reference to the original object. This means that using a method that updates that variable will update the original as well. This was not a problem with the number and string methods as they do not modify the original string (at least not the ones I have shown, maybe some do).
+
+This can also become an issue when repeating lists. For example we can try to make a 2-dimensional list like this:
+```python
+l = [[]]*3
+print(l) # [[],[],[]]
+l[0].append(1)
+print(l) # [[1],[1],[1]]
+```
+We see here that all three lists in `l` actually refer to the same list! This may be what we want, but not in this case. We can do this a different way using a loop:
+```python
+l = []
+for i in range(3):
+    l.append([])
+l[0].append(1)
+print(l) # [[1],[],[]]
+```
+
+### More Types to Look Into
+There are two useful types that I use quite a bit. They are sets and dictionaries. A set is just a collection of values. The point is to hold a record of whether some value is in the set or not. A set will have no duplicates. We can make a set as follows:
+```python
+favouriteNumbers = {1,42,64}
+emptySet = set()
+```
+We can add/remove items, and check whether they are in the set or not. We can also see how many items are in the set:
+```python
+favouriteNumbers.add(6)
+favouriteNumbers.remove(42)
+if 1 in favouriteNumbers:
+    print("1 is a favourite number!")
+print("I have", len(favouriteNumbers), "favourite numbers!")
+```
+
+Dictionaries are a mapping from one value, called a key, to another. This is analogous to a word dictionary where we have a word and its definition. We can make a dictionary as follows:
+```python
+numbers = {1: "one", 2: "two", 3: "three"}
+emptyDict = {}
+```
+
+We can check if a key is in the dictionary, get what it maps to, and add/change the values to the dictionary:
+```python
+if 1 in numbers:
+    print("1 in dictionary!")
+print(numbers[1])
+numbers[1] = "One" # update value
+numbers[4] = "four" # new value
+```
+
+I recommend reading up a bit more about these types, but this should give you a good start.
+
+### More on Function Arguments
+You might have noticed that for some functions we have options as to how many arguments we pass in. `print` is the most obvious example, we can give it an arbitrary amount of arguments, 0, 10, 100, etc. Another is `input`, we can give it an optional prompt, but is not necessary. So how does Python do this?
+
+Python actually has several types of arguments which I will refer to as positional, variadic and keyword arguments.
+A Python function can have the following arguments:
+```python
+def f(arg1,arg2,...,defarg1=val1,defarg2=val2,...,*args,**kwargs):
+    ... # note args and kwargs are just conventional names. You can call them whatever you want.
+```
+The positional arguments are all of the arguments from `arg1` up to but not including `*args`. `arg1`,`arg2`,... are the required positional arguments. You must pass values for these to be able to call the function. The `defarg1`... have a default value if none is specified. It is optional to pass a value for these. If you do want to pass a value you can do it like a normal positional value or directly specifying the argument name:
+```python
+def add(a, b=1, c=2):
+    return a + b + c
+print(add(1,2)) # 5 since b = 2
+print(add(1,c=3)) # 5 since c = 3
+```
+
+The variadic and keyword arguments I will mention together. For these two we can specify an arbitrary number of arguments. Variadic args are passed in like a list, similar to how `print` works. Keyword arguments are passed in like explicitly setting the positional arguments explicitly. Variadic args are passed in as a tuple (you can treat it as a list that can't be modified) and keyword arguments as a dictionary.
+```python
+def f(*args, **kwargs):
+    ...
+f(1, 2, 3, "a"="1", "b"="2")
+```
+When passing in arguments, you must specify all positional arguments you want to give, then all variadic, and then all keyword arguments. If you have positional arguments with default values you have to give a value for each before any go to the variadic arguments.
 ### Function Definition and Recursion
+Similar to variables, a function must be defined before it is used. Something to keep it mind is that a if you call a function inside another you are not using it immediately, it is only ever called when you run the second function (the one that's using the other one). This means that code like this is valid:
+```python
+def f(n):
+    return 4 * g(n) + 3
+
+def g(n):
+    return n * n
+
+print(f(2)) # 19
+```
+Another consequence is being able to call the the function inside of itself! This is called recursion, which I will not go into, but here is an [article](https://www.freecodecamp.org/news/recursion-is-not-hard-858a48830d83/) that goes over it.
+An example of recursion is the following:
+
+```python
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n-1)
+```
