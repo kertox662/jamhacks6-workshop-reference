@@ -44,11 +44,8 @@ class DatabaseIO(Resource):
 
 class Jams(Resource):
     def get(self, flavour=None):
-        if "action" in request.args and request.args["action"] == "list":
-            return {"data": list(jamDB.keys())}
-
         if flavour is None:
-            return {"message": f"error: invalid request, please specify a flavour"}, 400
+            return {"data": list(jamDB.keys())}
 
         if flavour not in jamDB:
             return {"message": f"error: we do not have the flavour {flavour}"}, 404
@@ -60,7 +57,7 @@ class Jams(Resource):
             }
         }
 
-    def patch(self, flavour):
+    def patch(self, flavour=None):
         if flavour not in jamDB:
             return {"message": f"error: we do not have the flavour {flavour}"}, 404
         
@@ -104,5 +101,5 @@ if __name__ == "__main__":
         print("Error reading Database file:")
         print(e)
         exit()
-
-    app.run(port=8000, debug=True)
+    print(jamDB)
+    app.run(host="0.0.0.0", port=8000, debug=True)
