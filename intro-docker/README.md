@@ -66,7 +66,7 @@ Digest: sha256:80f31da1ac7b312ba29d65080fddf797dd76acfb870e677f390d5acba9741b17
 Status: Downloaded newer image for hello-world:latest
 ```
 
-What's happening is that Docker is looking for the image `hello-world`. Assuming we have a new installation of Docker, such an image doesn't exist. It will then try to look for such an image in some repository, in this case DockerHub. It downloads the files for the image and then runs a container from that image.
+What's happening is that Docker is looking for the image `hello-world`. Assuming we have a new installation of Docker, such an image doesn't exist. It will then try to look for such an image in some repository, in this case DockerHub. It downloads the files for the image and then runs a container from that image. Another way to download an image is using `docker pull`, which we'll see later.
 
 We will be using `docker run` quite a bit today and trying out various configurations with it.
 
@@ -111,3 +111,194 @@ docker rmi hello-world
 ```
 
 Then running `docker ps -a` and `docker images` will show you that they have indeed been deleted.
+
+
+#### Image Tags
+As I mentioned, Docker images can be "versioned" by specifying a tag for the image. You can specify a tag using `image_name:tag` wherever you would use an image. The default tag is `latest` if no tag is specified. 
+
+Let's download two versions of the Python image:
+```
+docker pull python
+docker pull python:alpine
+```
+If we now run `docker images` we'll see these two images show up:
+```
+REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+python       alpine    4a53e5731019   2 days ago   47.1MB
+python       latest    25429fbb4a39   2 days ago   866MB
+```
+You might be surprised to see such a big difference, one is 47MB while the other is almost 1GB! The difference is the distribution that the image is based on, the normal Python image runs on Ubuntu, while the other runs on Alpine. Other tags might tell you what architecture the image is built for. For example, some images might only run on amd64 but have a tag for an arm version. This is especially important when running on an arm CPU such as Apple M1.
+
+We can create a new image from another using `docker tag <SOURCE_IMG> <DEST_IMG>`. Let's make a new image called `py` that is just the `python:alpine` image: `docker tag python:alpine py`
+
+Now we can run `docker images` to see our new image:
+```
+REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+py           latest    4a53e5731019   2 days ago   47.1MB
+python       alpine    4a53e5731019   2 days ago   47.1MB
+python       latest    25429fbb4a39   2 days ago   866MB
+```
+Notice that `py` and `python:alpine` have the same image ID. They actually refer to the same image, just two different names for it.
+
+I slightly misled you when I said that using `docker rmi` with both IDs and names is the same. This is slightly inaccurate. Here we see that `py` and `python:alpine` is the same image. Using the ID will indeed remove both images. On the other hand, removing `py` or `python:alpine` will try to remove the reference ("untag") to the `4a` image, and only remove the image itself if it is the last name the refers to it.
+
+#### More Running Options
+##### Running Your own commands
+When running a container we can configure how it runs. The first thing we will look at is the `-it` flags. Officially it will open a TTY and keep the container's Standard Open open even if you detach. The intuitive way I see it is a way of launching the container in "interactive mode".
+
+ Next, we will look at is the command that runs the launch of the container. There are two types of ways that the entry command can be started, which we will discuss a bit later. What the python image does though by default is run the `python` command which launches the Python shell. We can change this by specifying the command after the image name. For example, we can run the shell by running `docker run -it python bash`. You can explore the container like a normal Ubuntu system.
+
+##### Saving Changes You Make
+
+We can modify some files here. Let's do something simple, just write a Hello World python script in a new folder:
+```
+mkdir app
+echo 'print("Hello World!")' > app/hello.py
+```
+We can exit the container now, which will stop it.
+Running `docker ps -a` will show the container ID. Docker can save the changes we made here and create a new image. This is done using `docker commit <CONTAINER ID> <IMAGE:TAG>`. As an example, we can commit the changes into an image called `py:app`: `docker commit <ID> py:app`. 
+
+To test it, we now run `docker run py:app python3 /app/hello.py`
+
+---
+<!-- 
+Before we continue, please download this repository if you haven't already. You will have a folder called "examples/rest_server". This is a simple REST API. Let's navigate to the examples directory. -->
+
+##### Mapped Volumes
+Let's make another small script on our computer, outside of a container.
+```
+echo 'print("Hello From Host!")' > hello.py
+```
+or write a file called `hello.py` with `print("Hello From Host!")`.
+
+Normally containers can't access files from the host. Docker has an option to give access to 
+
+
+### Writing and Using a Dockerfile
+We ran a few containers from images, but how were those images made? In many cases, the answer is a Dockerfile. A Dockerfile describes the steps to take for building an image. We can use `docker build` to execute those steps.
+
+A Dockerfile usually looks something like (in meaning):
+```
+1. Use some kind of existing image as a starting point.
+2. Copy some files, run some command, change directory, etc.
+...
+3. When launching the container, run this command
+```
+
+I will cover 8 total Dockerfile instruction:
+- `FROM`
+- `COPY/ADD`
+- `RUN`
+- `ENV`
+- `WORKDIR`
+- `CMD/ENTRYPOINT`
+
+A full reference can be found in the [docs](https://docs.docker.com/engine/reference/builder/).
+
+In this repository there is the `rest_server` directory containing a REST API made in Flask (Python). We will build an image that will run this server. Please navigate to the `examples` folder.
+
+##### FROM
+
+Let's start with the `FROM` instruction. It specifies the base image we will be building from, step 1 in the intuitive format above. Since we have a python server, it makes starts with an image that has python installed. We looked at two images, one running on Ubuntu and one on Alpine. Here we really don't care which OS we're running from. Let's choose the smaller Alpine image.
+
+In a file called `Dockerfile` let's start with:
+```docker
+FROM python:alpine
+```
+We can now build this image by running `docker build .`, the dot specifying we want to do it in the current directory. Running `docker images`, we might see an entry like:
+```
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+<none>       <none>    48c3dfc7d26d   3 days ago     47.1MB
+```
+We built an image, but we didn't give it a name. We can tag it now or specify a tag to `docker build` by running: `docker build . --tag myapp`
+
+We will now see:
+```docker
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+myapp        latest    48c3dfc7d26d   3 days ago     47.1MB
+```
+We can run this like any other image, this will be mostly similar to running the base `python:alpine` image.
+
+Next we will look to copy our python files so that the container launches with them present. Both the `COPY` and `ADD` instructions accomplish this. The difference between them is that `ADD` has the same functionality as `COPY` but with some extra features. For example it can automatically decompress archives like zips, or will fetch files from a URL. `COPY` just takes files and directly copies them to the image and if that's all you need then that is the preferred instruction. Let's copy the entire folder to `/app` in the container.
+
+##### COPY and ADD
+
+`COPY` works like `COPY SRC DEST`, in our case `COPY rest_server /app`
+
+The Dockerfile looks like:
+```docker
+FROM python:alpine
+COPY rest_server /app
+```
+Let's rebuild and run the container with `docker run -it myapp sh`. When we look at the `/app` directory we will see all of the files. We can try to run the app with `python app/main.py` but we will get an error:
+
+```python
+ModuleNotFoundError: No module named 'flask'
+```
+We need to use `pip` to install all of the dependencies. The dependency needed is `flask_restful` so we can just do `pip install flask_restful`, but I have also provided a `requirements.txt` with it there, using `pip install -r requirements.txt`.
+
+We technically could install the package every single time we run a container from the image, but it would be easier to have the image already had everything installed. This is an opportunity for the `RUN` instruction! 
+
+##### RUN
+
+`RUN` just executes some shell command. By default it will do so from the root directory. In the Dockerfile it will look like `RUN COMMAND...`. For us we want either `RUN pip install flask_restful` or `RUN pip install -r app/requirements.txt`. In order to make it easier to modify the dependencies let's make it the second one.
+
+The Dockerfile will now look like:
+```docker
+FROM python:alpine
+COPY rest_server /app
+RUN  pip install -r app/requirements.txt
+```
+
+##### WORKDIR
+`WORKDIR` changes the working directory. When copying by files or running commands the default is to do some from the top most, root, directory. This will change where it will start from. For example, we can change it to our app directory. This can be done using just `WORKDIR /app`. Let's put it in before our `RUN` instruction.
+
+Remember that we specified the path for the requirements file from the root. Since we are now in the `app` directory we can drop the `app/`. In fact the way it is now does not work since the `app` directory does not have an `app` directory of its own! So we in fact need to do the change.
+
+The Dockerfile will now look like:
+```docker
+FROM python:alpine
+COPY rest_server /app
+WORKDIR /app
+RUN  pip install -r requirements.txt
+```
+
+##### ENV
+I'll quickly go over `ENV`, we do not need it in our Dockerfile but it may be useful. `ENV` just sets an environment variable in the container. The format is `ENV KEY=VALUE`, for example `ENV APP_NAME=/app/main.py`.
+
+##### CMD and ENTRYPOINT
+We finally get to the last instructions we will look at for Dockerfiles. The point of these instructions is to specify what to run when the container is launched. They do so in slightly different ways though. Both are specified like `CMD COMMAND...` or `CMD ["cmd1", "arg1", ...]`
+
+`CMD` specifies the default command to run when the container launches. This can be overridden when running the container just by putting your command we want after the image name. This is what we did with the Python image!
+
+`ENTRYPOINT` specifies the command that we run and cannot be changed. We can give more arguments when running the container, but these won't change the command. Instead, the arguments that we give will be passed as arguments to the command. As an example, say we have an entrypoint `ENTRYPOINT ["python", "main.py"]` and we run `docker run myapp python app.py` the container will actually run the following command at launch: `python main.py python app.py` where `python` and `app.py` are arguments to `main.py`.
+
+For this we don't really care which one we want to use. Either one will work for our simple behaviour. The server does have the option to take in a different database so we might want to use `ENTRYPOINT` for that. I will be choosing `CMD` though. So we will add `CMD ["python", "main.py"]`. Note we use `main.py` and not `app/main.py` since our work directory is already `/app`. Also the command format can vary, we could use `CMD python main.py` instead.
+
+Our final Dockerfile will look like:
+```docker
+FROM python:alpine
+COPY rest_server /app
+WORKDIR /app
+RUN  pip install -r requirements.txt
+CMD ["python", "main.py"]
+```
+
+### Next Steps
+We've taken a look at some Docker basics, but where do we go from here. The first thing is to look into something I mentioned a while ago, Networks and Volumes. They are additional features provided by Docker itself and helpful for running containers. Something else is to look at some other commands for docker itself and other instructions for Dockerfiles.
+
+A great step after is Docker Compose. It is a tool to help you coordinate Docker containers. I talked about how Docker really helped microservices become popular. It is tools like Docker Compose that help you manage the services container that house the microservices. It is a great way to start orchestrating containers.
+
+After even that there is a more sophisticated tool called Kubernetes. Similar to Docker Compose, the goal is orchestrate container, but in a more robust way. At the moment it is the industry standard for coordinating containers.
+
+### A Few Takeaways
+To wrap up, there are some things that I hope you take away from this.
+
+First, I don't expect you to remember all of the material I covered here right off the bat, I know I didn't. The goal of this document was not to make you a Docker expert just by reading it over once. Instead, my goal was to expose you to some things that Docker is capable of. I see knowing Docker's features as "I know there's a way to do this one thing" and "Here's how I do this one thing". I hope that you will partly remember the first, which will help you with the second. My main point, it's okay to not remember everything, if you know about something you can easily look online for how to use it and learn about it again.
+
+Second, I believe the best way to cement your knowledge is to practice with it. I've given you many examples in this documents on how to run containers. Try using them and modifying them to your own needs. Hopefully this practice with the commands will help ingrain it in muscle memory.
+
+Finally, you need to be prepared that you might be frustrated. Working with Docker is not the most intuitive, especially if you go for the microservice approach. It often leads to a different way of thinking. It is very important to stay patient and keep trying. The fact is, learning is hard. Trying to use something new that you haven't used before may be prove really tricky, but that's alright. Once you accept that it's normal to struggle with new ideas it will be easier to see what steps you need to take to help you learn.
+
+Hopefully you feel like you've learned something new from me covering docker.
+Happy Coding!
