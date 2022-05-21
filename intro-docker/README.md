@@ -164,15 +164,61 @@ To test it, we now run `docker run py:app python3 /app/hello.py`
 <!-- 
 Before we continue, please download this repository if you haven't already. You will have a folder called "examples/rest_server". This is a simple REST API. Let's navigate to the examples directory. -->
 
-##### Mapped Volumes
-Let's make another small script on our computer, outside of a container.
+##### Bind Mounts
+Normally containers can't access files from the host. We will be looking at one way of sharing data with the host system: a bind mount. The idea is to map a directory from the host or file from the host OS into the container. To see this in action, let's make another small script on our computer.
 ```
 echo 'print("Hello From Host!")' > hello.py
 ```
 or write a file called `hello.py` with `print("Hello From Host!")`.
 
-Normally containers can't access files from the host. Docker has an option to give access to 
+Now, there are technically two ways to make a bind mount, the traditional way and a more modernized approach. Today I will be showing the modern approach, but feel free to check out the [docs](https://docs.docker.com/storage/bind-mounts/) for how the traditional syntax looks like. I personally prefer the traditional approach because it is much shorter but the modern approach is preferred.
 
+We specify a bind mount using the option `--mount type=bind,source=<SRC_PATH>,target=<DEST_PATH>`. The source path must be the absolute path on host OS. 
+
+Let's check out the file we just made in a container. To do so, run:
+```sh
+docker run --mount type=bind,source=$(pwd)/hello.py,target=hello/main.py \
+-it python bash
+```
+Looking at the `/hello` directory we see a file `main.py`. Importantly, this is the same file that we have on the Host OS. This means that changes we make in the container will appear on the Host OS. Let's have the script print another message:
+```
+echo 'print("Hello from Container!")' >> /hello/main.py
+```
+
+Now checking out the file outside the container, we'll see the changes we made.
+
+Bind mounts can also be used with directories in basically the same way.
+
+##### Detaching From a Container
+When running a container, we may sometimes want the process to run in the background. There are a few ways to do that.
+
+The first way is my using a shortcut when running inside of the container. Let's run our favourite container: `docker run -it python bash`. We can now press `Ctrl-p Ctrl-q` to detach from the container. I have found issues in VS code, but this is great in the terminal.
+
+Another way of having a detached container is by starting it detached. This is specified using the `-d` flag. For example, `docker run -d python bash`. Although just running bash is useless by itself, but we can imagine we're running some useful command.
+
+Once we have a detached container, we can attach back by using `docker attach <CONTAINER_ID>`.
+
+
+##### Exposing a Port
+Similar to files and other resources, containers don't automatically have access to network ports. I'm not going to cover network ports, hopefully you know about them, but if you need a refresher here is a good [article](https://www.techtarget.com/searchnetworking/definition/port) discussing them. 
+
+Let's start using an example image that runs a simple rest server. The methods and endpoints can be found in `examples/README.md`. Let's pull the image: `docker pull kertox662/jamhacks6`. Note that this image is built for arm CPUs, you might need to pull a different tag. There is the `amd` tag. If you want, feel free to tag it to something else, like `docker tag kertox662/jamhacks6 jh6` to make it easier to run.
+
+Now that we have the image, we can run it. We expose a port using the `-p HOST_PORT:CONTAINER_PORT`, for example `-p 1234:80` which maps port 1234 on the Host OS to port 80 inside of the container. Our application runs on port `8000`. Let's now launch our container:
+```
+docker run -d -p 8000:8000 jh6
+```
+
+Let's test the app in the container. I'll use `curl` and this works great on Mac and Linux. Windows users might want to try the `curl.py` script in the repository which takes arguments `<METHOD> <URL>`.
+
+```
+curl localhost:8000/jam
+``` 
+
+We should see:
+```
+{"data": ["strawberry", "blueberry", "raspberry", "grape"]}
+```
 
 ### Writing and Using a Dockerfile
 We ran a few containers from images, but how were those images made? In many cases, the answer is a Dockerfile. A Dockerfile describes the steps to take for building an image. We can use `docker build` to execute those steps.
@@ -197,7 +243,7 @@ A full reference can be found in the [docs](https://docs.docker.com/engine/refer
 
 In this repository there is the `rest_server` directory containing a REST API made in Flask (Python). We will build an image that will run this server. Please navigate to the `examples` folder.
 
-##### FROM
+#### FROM
 
 Let's start with the `FROM` instruction. It specifies the base image we will be building from, step 1 in the intuitive format above. Since we have a python server, it makes starts with an image that has python installed. We looked at two images, one running on Ubuntu and one on Alpine. Here we really don't care which OS we're running from. Let's choose the smaller Alpine image.
 
@@ -221,7 +267,7 @@ We can run this like any other image, this will be mostly similar to running the
 
 Next we will look to copy our python files so that the container launches with them present. Both the `COPY` and `ADD` instructions accomplish this. The difference between them is that `ADD` has the same functionality as `COPY` but with some extra features. For example it can automatically decompress archives like zips, or will fetch files from a URL. `COPY` just takes files and directly copies them to the image and if that's all you need then that is the preferred instruction. Let's copy the entire folder to `/app` in the container.
 
-##### COPY and ADD
+#### COPY and ADD
 
 `COPY` works like `COPY SRC DEST`, in our case `COPY rest_server /app`
 
@@ -239,7 +285,7 @@ We need to use `pip` to install all of the dependencies. The dependency needed i
 
 We technically could install the package every single time we run a container from the image, but it would be easier to have the image already had everything installed. This is an opportunity for the `RUN` instruction! 
 
-##### RUN
+#### RUN
 
 `RUN` just executes some shell command. By default it will do so from the root directory. In the Dockerfile it will look like `RUN COMMAND...`. For us we want either `RUN pip install flask_restful` or `RUN pip install -r app/requirements.txt`. In order to make it easier to modify the dependencies let's make it the second one.
 
@@ -250,7 +296,7 @@ COPY rest_server /app
 RUN  pip install -r app/requirements.txt
 ```
 
-##### WORKDIR
+#### WORKDIR
 `WORKDIR` changes the working directory. When copying by files or running commands the default is to do some from the top most, root, directory. This will change where it will start from. For example, we can change it to our app directory. This can be done using just `WORKDIR /app`. Let's put it in before our `RUN` instruction.
 
 Remember that we specified the path for the requirements file from the root. Since we are now in the `app` directory we can drop the `app/`. In fact the way it is now does not work since the `app` directory does not have an `app` directory of its own! So we in fact need to do the change.
@@ -263,10 +309,10 @@ WORKDIR /app
 RUN  pip install -r requirements.txt
 ```
 
-##### ENV
+#### ENV
 I'll quickly go over `ENV`, we do not need it in our Dockerfile but it may be useful. `ENV` just sets an environment variable in the container. The format is `ENV KEY=VALUE`, for example `ENV APP_NAME=/app/main.py`.
 
-##### CMD and ENTRYPOINT
+#### CMD and ENTRYPOINT
 We finally get to the last instructions we will look at for Dockerfiles. The point of these instructions is to specify what to run when the container is launched. They do so in slightly different ways though. Both are specified like `CMD COMMAND...` or `CMD ["cmd1", "arg1", ...]`
 
 `CMD` specifies the default command to run when the container launches. This can be overridden when running the container just by putting your command we want after the image name. This is what we did with the Python image!
